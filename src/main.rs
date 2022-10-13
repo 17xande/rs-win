@@ -1,27 +1,16 @@
 use windows::{
     core::*, 
-    Data::Xml::Dom::*,
-    Win32::Foundation::*,
-    Win32::System::Threading::*,
-    Win32::UI::WindowsAndMessaging::*,
+    Win32::UI::Shell::*,
 };
 
+#[implement(IDesktopWallpaper)]
+struct Dw();
+
 fn main() -> Result<()> {
-    let doc = XmlDocument::new()?;
-    doc.LoadXml(w!("<html>hello world</html>"))?;
-
-    let root = doc.DocumentElement()?;
-    assert!(root.NodeName()? == "html");
-    assert!(root.InnerText()? == "hello world");
-
+    let name = w!("wallpaper1.jpg");
+    let wallpaper: IDesktopWallpaper = Dw().into();
     unsafe {
-        let event = CreateEventW(None, true, false, None)?;
-        SetEvent(event).ok()?;
-        WaitForSingleObject(event, 0);
-        CloseHandle(event).ok()?;
-
-        MessageBoxA(None, s!("Ansi"), s!("Caption"), MB_OK);
-        MessageBoxW(None, w!("Wide"), w!("Caption"), MB_OK);
+        wallpaper.SetWallpaper(w!("0"), name);
     }
 
     Ok(())
